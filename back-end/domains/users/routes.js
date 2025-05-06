@@ -24,15 +24,14 @@ router.get('/', async (req, res) => {
 
 router.get('/profile', async (req, res) => {
     const { token } = req.cookies;
-    
+
     if (token) {
-        try {
-            const userInfo = jwt.verify(token, JWT_SECRET_KEY);
+        jwt.verify(token, JWT_SECRET_KEY, {}, (error, userInfo) => {
+            if (error) throw error;
 
             res.json(userInfo)
-        } catch (error) {
-            res.status(500).json(error);
-        }
+        });
+
     } else {
         res.json(null)
     }
@@ -86,6 +85,10 @@ router.post('/login', async (req, res) => {
     } catch (error) {
         res.status(500).json(error);
     }
-})
+});
+
+router.post("/logout", (req, res) => {
+    res.clearCookie("token").json("Deslogado com sucesso!");
+});
 
 export default router;
